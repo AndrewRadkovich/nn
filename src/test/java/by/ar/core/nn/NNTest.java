@@ -2,22 +2,45 @@ package by.ar.core.nn;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static by.ar.core.nn.NnNeuronFixture.initNN;
+import static org.junit.Assert.assertEquals;
 
 public class NNTest {
 
   @Test
   public void testImpulseDiffusion() throws Exception {
-    Integer[] outputNeuronIds = {5, 6};
-    Integer[] inputNeuronIds = {1, 2, 3};
-    NN<Integer> net = new NN<Integer>()
+    Integer[] outputNeuronIds = {6};
+    Integer[] inputNeuronIds = {1, 2};
+    NN<Integer> net = new NN<>(initNN())
         .input(inputNeuronIds)
         .output(outputNeuronIds);
 
-    double[] inputSignals = new double[] {1.0, 0.7, 0.35};
-    double[] outputSignals = net.sim(inputSignals);
+    double[] inputSignals = {0.9, 0.9, 0.9};
+    double[] output1 = net.sim(inputSignals);
 
-    assertEquals(outputNeuronIds.length, outputSignals.length);
-    assertNotNull(outputSignals);
+    assertEquals(0.0, net.chargeOf(1), 0.001);
+    assertEquals(0.0, net.chargeOf(2), 0.001);
+    assertEquals(0.6, net.chargeOf(3), 0.001);
+    assertEquals(0.6, net.chargeOf(4), 0.001);
+    assertEquals(0.6, net.chargeOf(5), 0.001);
+    assertEquals(0.0, output1[0], 0.001);
+
+    double[] output2 = net.sim(inputSignals);
+
+    assertEquals(0.0, net.chargeOf(1), 0.001);
+    assertEquals(0.0, net.chargeOf(2), 0.001);
+    assertEquals(0.0, net.chargeOf(3), 0.001);
+    assertEquals(0.0, net.chargeOf(4), 0.001);
+    assertEquals(0.0, net.chargeOf(5), 0.001);
+    assertEquals(1.5, output2[0], 0.001);
+
+    double[] output3 = net.sim(inputSignals);
+
+    assertEquals(0.0, net.chargeOf(1), 0.001);
+    assertEquals(0.0, net.chargeOf(2), 0.001);
+    assertEquals(0.6, net.chargeOf(3), 0.001);
+    assertEquals(0.6, net.chargeOf(4), 0.001);
+    assertEquals(0.6, net.chargeOf(5), 0.001);
+    assertEquals(0.0, output3[0], 0.001);
   }
 }

@@ -30,17 +30,21 @@ public class BreathFirstSearch<K, V> extends SearchAlgorithm<K, V> {
   }
 
   @Override
-  public void doSearch(K rootId) {
+  public List<K> travel(K rootId) {
+    List<K> lastNodes = new LinkedList<>();
     visited = markAllAsNotVisited(graph);
     queue = initQueueWithRoot(rootId);
     while (!queue.isEmpty()) {
       K nodeId = next();
-      boolean childrenAreToBeProcessed = process(nodeId);
-      if (childrenAreToBeProcessed) {
-        List<K> children = expand(nodeId);
-        children.forEach(this::push);
+      process(nodeId);
+      if (shouldStop(graph.dataOf(nodeId))) {
+        lastNodes.add(nodeId);
+        continue;
       }
+      List<K> children = expand(nodeId);
+      children.forEach(this::push);
     }
+    return lastNodes;
   }
 
   private List<K> expand(K nodeId) {
@@ -52,8 +56,8 @@ public class BreathFirstSearch<K, V> extends SearchAlgorithm<K, V> {
       queue.add(nodeId);
   }
 
-  private boolean process(K nodeId) {
-    return processor.process(graph, nodeId);
+  private void process(K nodeId) {
+    processor.process(graph, nodeId);
   }
 
   private K next() {

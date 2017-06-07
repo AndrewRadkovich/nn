@@ -24,7 +24,8 @@ public class Graph<K, V> extends Lookup<K, K> {
   }
 
   public List<V> childrenOf(K nodeId) {
-    return get(nodeId).stream().map(this::dataOf).collect(toList());
+    List<K> list = get(nodeId);
+    return list.stream().map(this::dataOf).collect(toList());
   }
 
   public V dataOf(K nodeId) {
