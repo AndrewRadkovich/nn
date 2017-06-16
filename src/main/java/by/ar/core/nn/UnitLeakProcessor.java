@@ -4,7 +4,7 @@ import by.ar.core.graph.Graph;
 import by.ar.core.graph.processor.Processor;
 import org.apache.log4j.Logger;
 
-import java.util.List;
+import java.util.Map;
 
 public class UnitLeakProcessor<K> implements Processor<K, Neuron> {
 
@@ -16,14 +16,14 @@ public class UnitLeakProcessor<K> implements Processor<K, Neuron> {
     if (currentNeuron.charge >= currentNeuron.leakLevel) {
       log.debug("Current neuron: " + currentNodeId);
       log.debug("Current neuron children: " + graph.get(currentNodeId));
-      List<Neuron> children = graph.childrenOf(currentNodeId);
+      Map<K, Neuron> children = graph.childrenWithIdsOf(currentNodeId);
       int size = children.size();
       if (size == 0) {
         log.debug(currentNodeId + " is a leaf, no need to process.");
         return;
       }
-      children.forEach(neuron -> {
-        neuron.charge = neuron.func.apply(neuron.charge + currentNeuron.charge / size);
+      children.forEach((id, neuron) -> {
+        neuron.charge = neuron.func.apply(neuron.charge * graph.weight(currentNodeId, id) + currentNeuron.charge / size);
         log.debug("Child neuron charge: " + neuron.charge);
       });
       log.debug("Setting charge to 0.0 for " + currentNodeId);

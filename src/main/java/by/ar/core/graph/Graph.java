@@ -2,14 +2,13 @@ package by.ar.core.graph;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
-
 public class Graph<K, V> extends Lookup<K, K> {
   private Map<K, V> idToData = new HashMap<>();
+  private Map<K, Map<K, Double>> weights = new HashMap<>();
   private Set<K> ids = new HashSet<>();
 
-  public ToWord<K, V> from(K from) {
-    return new ToWord<>(from, this);
+  public WeightOrToWord<K, V> from(K from) {
+    return new WeightOrToWord<>(from, this);
   }
 
   @Override
@@ -23,9 +22,11 @@ public class Graph<K, V> extends Lookup<K, K> {
     idToData.put(key, value);
   }
 
-  public List<V> childrenOf(K nodeId) {
+  public Map<K, V> childrenWithIdsOf(K nodeId) {
     List<K> list = get(nodeId);
-    return list.stream().map(this::dataOf).collect(toList());
+    HashMap<K, V> map = new HashMap<>();
+    list.forEach(id -> map.put(id, dataOf(id)));
+    return map;
   }
 
   public V dataOf(K nodeId) {
@@ -36,21 +37,51 @@ public class Graph<K, V> extends Lookup<K, K> {
     return ids;
   }
 
+  public double weight(K from, K to) {
+    return weights.get(from).get(to);
+  }
+
   public static class ToWord<K, V> {
 
     K from;
+    double weight;
     Graph<K, V> graph;
 
     ToWord(K from, Graph<K, V> graph) {
       this.from = from;
       this.graph = graph;
+      this.weight = 1.0;
+    }
+
+    ToWord(K from, Graph<K, V> graph, double weight) {
+      this.from = from;
+      this.graph = graph;
+      this.weight = weight;
     }
 
     @SafeVarargs
     public final void to(K... tos) {
+      Map<K, Double> weightsToChildren;
+      if (graph.weights.containsKey(from)) {
+        weightsToChildren = graph.weights.get(from);
+      } else {
+        graph.weights.put(from, weightsToChildren = new HashMap<>());
+      }
       for (K to : tos) {
         graph.add(from, to);
+        weightsToChildren.put(to, weight);
       }
+    }
+  }
+
+  public static class WeightOrToWord<K, V> extends ToWord<K, V> {
+
+    WeightOrToWord(K from, Graph<K, V> graph) {
+      super(from, graph);
+    }
+
+    public final ToWord<K, V> weight(double weight) {
+      return new ToWord<>(from, graph, weight);
     }
   }
 }
