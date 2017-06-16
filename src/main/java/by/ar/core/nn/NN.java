@@ -26,12 +26,14 @@ public class NN<K> {
     traverseAlgorithm.stopWhen(signalIsWeak);
   }
 
-  public NN<K> input(K... neuronIds) {
+  @SafeVarargs
+  public final NN<K> input(K... neuronIds) {
     this.inputNeurons = neuronIds;
     return this;
   }
 
-  public NN<K> output(K... neuronIds) {
+  @SafeVarargs
+  public final NN<K> output(K... neuronIds) {
     this.outputNeurons = neuronIds;
     return this;
   }
@@ -45,6 +47,10 @@ public class NN<K> {
 
   public double chargeOf(K neuronId) {
     return neurons.dataOf(neuronId).charge;
+  }
+
+  public Graph<K, Neuron> neurons() {
+    return neurons;
   }
 
   private void diffuseImpulse() {

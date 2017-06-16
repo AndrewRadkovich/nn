@@ -1,6 +1,7 @@
 package by.ar.core.graph;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class Graph<K, V> extends Lookup<K, K> {
   private Map<K, V> idToData = new HashMap<>();
@@ -39,6 +40,10 @@ public class Graph<K, V> extends Lookup<K, K> {
 
   public double weight(K from, K to) {
     return weights.get(from).get(to);
+  }
+
+  public void forEach(BiConsumer<? super K, ? super V> action) {
+    idToData.forEach(action);
   }
 
   public static class ToWord<K, V> {

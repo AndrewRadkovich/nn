@@ -14,8 +14,7 @@ public class UnitLeakProcessor<K> implements Processor<K, Neuron> {
   public void process(Graph<K, Neuron> graph, K currentNodeId) {
     Neuron currentNeuron = graph.dataOf(currentNodeId);
     if (currentNeuron.charge >= currentNeuron.leakLevel) {
-      log.debug("Current neuron: " + currentNodeId);
-      log.debug("Current neuron children: " + graph.get(currentNodeId));
+      log.debug("neuron[" + currentNodeId + "].children => " + graph.get(currentNodeId));
       Map<K, Neuron> children = graph.childrenWithIdsOf(currentNodeId);
       int size = children.size();
       if (size == 0) {
@@ -24,9 +23,9 @@ public class UnitLeakProcessor<K> implements Processor<K, Neuron> {
       }
       children.forEach((id, neuron) -> {
         neuron.charge = neuron.func.apply(neuron.charge * graph.weight(currentNodeId, id) + currentNeuron.charge / size);
-        log.debug("Child neuron charge: " + neuron.charge);
+        log.debug(neuron.charge + " => neuron[" + id + "].charge");
       });
-      log.debug("Setting charge to 0.0 for " + currentNodeId);
+      log.debug("0.0 => neuron[" + currentNodeId + "].charge");
       currentNeuron.charge = 0.0;
     }
   }
